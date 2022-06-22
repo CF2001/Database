@@ -234,8 +234,120 @@ EXEC sp_updateInfoPaciente 12345070, 'Mario', 'Silva', '1999-12-02', 'M', '92181
 
 
 
+/** Eliminar um Paciente da lista de Pacientes internados e atualizar a cama para livre */
+DROP PROC UpdatePaciente_NaoInternado;
+GO 
+CREATE PROCEDURE UpdatePaciente_NaoInternado (@noUtenteSaude INT, @quartoID INT)
+AS
+	BEGIN 
+		BEGIN TRANSACTION
+		SET NOCOUNT ON
+
+		BEGIN TRY
+
+			DECLARE @camaOcupada AS BIT;
+			DECLARE @IDCama AS CHAR(10);
+
+			SELECT @IDCama = ID_Cama, @camaOcupada = camaOcupada FROM Cama_Hospital
+			WHERE ID_Quarto = @quartoID AND camaOcupada = 0;
+
+			-- Paciente deixa de estar internado no Hospital
+			UPDATE Paciente 
+			SET ID_Quarto = NULL, dataEntrada = NULL, dataSaida = NULL
+			WHERE noUtenteSaude = @noUtenteSaude;
+
+			UPDATE TOP(1) Cama_Hospital 
+			SET camaOcupada = 0
+			WHERE (ID_Quarto = @quartoID AND camaOcupada = 1);
+
+			IF @camaOcupada = 0
+			BEGIN
+				DELETE FROM Enf_Supervisiona WHERE ID_Cama_EnfS = @IDCama; 
+			END
+			
+			COMMIT TRANSACTION
+		END TRY
+
+		BEGIN CATCH
+			PRINT ERROR_MESSAGE()
+			ROLLBACK
+		END CATCH
+			
+	END 
+
+-- Teste 
+SELECT * FROM Paciente;
+SELECT * FROM Cama_Hospital;
+SELECT * FROM Enf_Supervisiona;
+EXEC UpdatePaciente_NaoInternado 87969404, 4; 
 
 
+
+/** Atribuir um quarto a um Paciente,
+ -- Adicionar o Paciente à lista de pacientes internados 
+ -- atualizar o estado de uma cama do quarto para 1 (Ocupado) */
+DROP PROC UpdatePaciente_Internado;
+GO
+CREATE PROCEDURE UpdatePaciente_Internado (@noUtenteSaude INT, @dataEntrada DATE, @dataSaida DATE, @quartoID INT)
+AS 
+	BEGIN
+		BEGIN TRANSACTION
+		SET NOCOUNT ON
+
+		BEGIN TRY
+
+			-- Paciente passa a estar internado no Hospital
+			UPDATE Paciente 
+			SET ID_Quarto = @quartoID, dataEntrada = @dataEntrada, dataSaida = @dataSaida
+			WHERE noUtenteSaude = @noUtenteSaude;
+
+			UPDATE TOP(1) Cama_Hospital 
+			SET camaOcupada = 1
+			WHERE (ID_Quarto = @quartoID AND camaOcupada = 0);
+			
+			COMMIT TRANSACTION
+		END TRY
+
+		BEGIN CATCH
+			PRINT ERROR_MESSAGE()
+			ROLLBACK
+		END CATCH
+	END
+
+-- Teste 
+SELECT * FROM Paciente;
+EXEC UpdatePaciente_Internado  22222730, '2022-06-22', '2022-07-22', 6; 
+
+
+/*** Atualização da data de Entrada e Saida de um Paciente internado **/
+DROP UpdateDadosPaciente_Internado;
+GO
+CREATE PROCEDURE UpdateDadosPaciente_Internado (@noUtenteSaude INT, @dataEntrada DATE, @dataSaida DATE)
+AS 
+	BEGIN
+		BEGIN TRANSACTION
+		SET NOCOUNT ON
+
+		BEGIN TRY
+
+			-- Paciente passa a estar internado no Hospital
+			UPDATE Paciente 
+			SET dataEntrada = @dataEntrada, dataSaida = @dataSaida
+			WHERE noUtenteSaude = @noUtenteSaude;
+			
+			COMMIT TRANSACTION
+		END TRY
+
+		BEGIN CATCH
+			PRINT ERROR_MESSAGE()
+			ROLLBACK
+		END CATCH
+	END
+
+-- Teste 
+SELECT * FROM Paciente;
+SELECT * FROM Cama_Hospital;
+EXEC UpdateDadosPaciente_Internado  22222730, '2022-06-22', NULL;
 
 ------------------------------------------------------ FUNCIONÁRIO ------------------------------------------------------------------
 
@@ -245,6 +357,3 @@ EXEC sp_updateInfoPaciente 12345070, 'Mario', 'Silva', '1999-12-02', 'M', '92181
 /* Eliminar um Funcionário do sistema em função do seu func_ID */
 
 /* Atualizar os dados de um Funcionário no Sistema.	*/
-
-
-/**** NOTA: Para UDFs fazer filtragem de DADOS !!!!!

@@ -157,7 +157,8 @@ INSERT INTO Enf_Auxilia VALUES (16, 34521102)
 
 
 -- Enf_Supervisiona								
--- (func_ID_Enf, ID_Cama)
+-- (func_ID_Enf, ID_Cama_EnfS)
+
 INSERT INTO Enf_Supervisiona VALUES (2, 'A2')
 INSERT INTO Enf_Supervisiona VALUES (3, 'A4')
 INSERT INTO Enf_Supervisiona VALUES (10, 'A5')
@@ -231,5 +232,5 @@ INSERT INTO EM_contemMed VALUES (4, 2)
 
 -- TESTES 
 -- DELETE FROM Cama_Hospital;
--- SELECT * FROM Paciente;
+--SELECT * FROM Paciente;
 --DELETE FROM Paciente WHERE noUtenteSaude=1237858;

@@ -88,7 +88,7 @@ CREATE TABLE Paciente (
 
 
 CREATE TABLE Cama_Hospital (
-	ID_Cama		CHAR(10)   NOT NULl,
+	ID_Cama		CHAR(20)   NOT NULl,
 	camaOcupada	BIT		NOT NULL,		-- 0 : live , 1: ocupado
 	ID_Quarto	INT		,				-- Pode ser null, se a cama não estiver a ser usada
 
@@ -108,12 +108,12 @@ CREATE TABLE Enf_Auxilia (
 
 
 CREATE TABLE Enf_Supervisiona (
-	func_ID_Enf		INT			NOT NULL,
-	ID_Cama			CHAR(10)	NOT NULL,
+	func_ID_EnfS	INT			NOT NULL,
+	ID_Cama_EnfS	CHAR(20)	NOT NULL,
 
-	PRIMARY KEY (func_ID_Enf, ID_Cama),
-	FOREIGN KEY (func_ID_Enf)	REFERENCES Enfermeiro(func_ID_Enf),
-	FOREIGN KEY (ID_Cama)	REFERENCES Cama_Hospital (ID_Cama)
+	PRIMARY KEY (func_ID_EnfS, ID_Cama_EnfS),
+	FOREIGN KEY (func_ID_EnfS)	REFERENCES Enfermeiro(func_ID_Enf),
+	FOREIGN KEY (ID_Cama_EnfS)	REFERENCES Cama_Hospital (ID_Cama)
 );
 
 CREATE TABLE Consulta (
