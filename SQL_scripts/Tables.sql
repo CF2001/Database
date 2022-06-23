@@ -11,6 +11,7 @@ CREATE TABLE Funcionario (
 	email			CHAR(30)	NOT NULL,
 	noTelefone		CHAR(9)		NOT NULL,
 	salary			SMALLMONEY	CHECK(salary > 0),
+	tipo			CHAR(1)		NOT NULL,
 
 	PRIMARY KEY (func_ID)
 );
