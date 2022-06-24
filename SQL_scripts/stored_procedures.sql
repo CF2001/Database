@@ -49,8 +49,13 @@ Select * from Paciente;
 Select * from Cama_Hospital;
 
 -- Teste 
-EXEC sp_registoPaciente 111132, 'Maria', 'Mendes', '1970-03-14', 'F', '917483921', 1, NULL, NULL, NULL;
-EXEC sp_registoPaciente 7429743, 'Vitor', 'Silveira', '2001-03-14', 'M', '917482920', 1, 2, '2022-06-17', NULL;
+EXEC sp_registoFuncionario 20, 'Maria', 'Mendes', 'F', 'Rua J', '1970-03-14', 'mariamendes@gmail.com', 917483921, 1000, 'E', 2, NULL;
+SELECT * FROM Funcionario;
+SELECT * FROM Enfermeiro;
+EXEC sp_registoFuncionario 20, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
+EXEC sp_registoFuncionario 25, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
+SELECT * FROM Funcionario;
+SELECT * FROM Medico;
 
 
 /* Eliminar um Paciente do sistema em função do seu noUtendeSaude */ 
@@ -355,8 +360,8 @@ EXEC UpdateDadosPaciente_Internado  22222730, '2022-06-22', NULL;
 /* Inserir um Funcionário no sistema do Hospital  */
 DROP PROC sp_registoFuncionario;
 GO 
-CREATE PROCEDURE sp_registoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @dataNascimento DATE, @genero CHAR(1), @telefone CHAR(9), 
-									@morada CHAR(40), @salary SMALLMONEY, @email CHAR(30), @tipo CHAR(1), @deptID SMALLINT, @balcao CHAR(1))
+CREATE PROCEDURE sp_registoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE, 
+										@email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1), @deptID SMALLINT, @balcao CHAR(1))
 AS 
 BEGIN
 
@@ -371,29 +376,41 @@ BEGIN
 	ELSE
 		IF @tipo = 'M'
 			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @dataNascimento, @genero, @telefone, @morada, @salary, @email, @tipo);
+				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
 				INSERT INTO Medico VALUES  (@funcID, @deptID);
 				PRINT 'Sucess';
 			END
 		ELSE IF @tipo = 'E'
 			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @dataNascimento, @genero, @telefone, @morada, @salary, @email, @tipo);
+				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
 				INSERT INTO Enfermeiro VALUES  (@funcID, @deptID);
 				PRINT 'Sucess';
 			END
 		ELSE
 			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @dataNascimento, @genero, @telefone, @morada, @salary, @email, @tipo);
+				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
 				INSERT INTO Rececionista VALUES  (@funcID, @balcao);
 				PRINT 'Sucess';
 			END
 END
+
+EXEC sp_registoFuncionario 20, 'Maria', 'Mendes', 'F', 'Rua J', '1970-03-14', 'mariamendes@gmail.com', 917483921, 1000, 'E', 2, NULL;
+SELECT * FROM Funcionario;
+SELECT * FROM Enfermeiro;
+EXEC sp_registoFuncionario 20, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
+EXEC sp_registoFuncionario 25, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
+SELECT * FROM Funcionario;
+SELECT * FROM Medico;
+EXEC sp_registoFuncionario 30, 'Miranda', 'Sousa', 'F', 'Rua M', '1999-03-14', 'miranda@gmail.com', 917452946, 900, 'F', NULL, 'B';
+SELECT * FROM Funcionario;
+SELECT * FROM Rececionista;
+
 /* Eliminar um Funcionário do sistema em função do seu func_ID */
 DROP PROC sp_eliminarFuncionario;
 GO 
 CREATE PROCEDURE sp_eliminarFuncionario (@func_ID INT)
 AS 
-BEGIN
+	BEGIN
 		DECLARE @type AS CHAR(1);
 		DECLARE @medico_consulta AS INT;
 		DECLARE @medico_cirurgia AS INT;
@@ -403,10 +420,10 @@ BEGIN
 		DECLARE @enfermeiro_auxilia AS INT;
 
 		SELECT @type = tipo FROM Funcionario WHERE @func_ID = func_ID;
-		SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
 
 		IF @type = 'M'
 			BEGIN
+				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
 				-- Verificar se o medico tinha consulta marcada
 				SELECT @medico_consulta = COUNT (*) FROM Consulta WHERE func_ID_Medico = @func_ID;
 				IF @medico_consulta > 0	-- medico tem consulta
@@ -425,6 +442,7 @@ BEGIN
 
 		ELSE IF @type = 'E'
 			BEGIN
+				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE @func_ID = func_ID_Enf;
 				--Verificar se o enfermeiro tinha cirurgia marcada
 				SELECT @enfermeiro_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE func_ID_Enf = @func_ID;
 				IF @enfermeiro_cirurgia > 0	-- enfermeiro tem cirurgia
@@ -446,7 +464,7 @@ BEGIN
 					SET func_ID_Enf = NULL, noUtenteSaude = NULL
 					WHERE func_ID_Enf = @func_ID;
 				*/
-				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_Enf; --não tenho a certeza destes 2
+				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_EnfS; --não tenho a certeza destes 2
 				DELETE FROM Enf_Auxilia WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Enfermeiro WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;
@@ -457,12 +475,25 @@ BEGIN
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;
 			END
 		END
-END	
+
+--Testes
+EXEC sp_eliminarFuncionario 25;
+SELECT * FROM Funcionario;
+SELECT * FROM Medico;
+
+EXEC sp_eliminarFuncionario 20;
+SELECT * FROM Funcionario;
+SELECT * FROM Enfermeiro;
+
+EXEC sp_eliminarFuncionario 30;
+SELECT * FROM Funcionario;
+SELECT * FROM Rececionista;
+
 /* Atualizar os dados de um Funcionário no Sistema.	*/
 DROP PROC sp_updateInfoFuncionario;
 GO 
-CREATE PROCEDURE sp_updateInfoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @dataNascimento DATE, @genero CHAR(1), @telefone CHAR(9), 
-									@morada CHAR(40), @salary SMALLMONEY, @email CHAR(30), @tipo CHAR(1))
+CREATE PROCEDURE sp_updateInfoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE, 
+										@email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1))
 AS
 BEGIN 
 	BEGIN TRY
@@ -536,3 +567,7 @@ BEGIN
 			ROLLBACK
 		END CATCH	
 END 
+
+--Testes
+EXEC sp_updateInfoFuncionario 30, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 950, NULL;
+SELECT * FROM Funcionario;

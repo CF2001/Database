@@ -87,3 +87,43 @@ GO
 --Teste
 SELECT * FROM getDepartBy_Name('Emergência');
 
+
+/** Pesquisar um Funcionario em função do seu ID */
+DROP FUNCTION getFuncByID;
+GO 
+CREATE FUNCTION getFuncByID (@funcID INT) RETURNS TABLE
+AS 
+	RETURN (SELECT * 
+			FROM Funcionario
+			WHERE func_ID = @funcID 
+			)
+
+GO
+-- Teste
+SELECT * FROM getFuncByID(3);
+
+/** Pesquisar uma Consulta pelo numero de Utente de Saude do Paciente **/
+DROP FUNCTION getConsulta;
+GO 
+CREATE FUNCTION getConsulta (@noUtenteSaude INT ) RETURNS TABLE
+AS 
+	RETURN (SELECT *
+			FROM Consulta 
+			WHERE @noUtenteSaude = noUtenteSaude
+			)
+GO
+--Teste
+SELECT * FROM getConsulta(12345070);
+
+/** Pesquisar uma Cirurgia pelo numero de Utente de Saude do Paciente **/
+DROP FUNCTION getCirurgia;
+GO 
+CREATE FUNCTION getCirurgia (@noUtenteSaude INT ) RETURNS TABLE
+AS 
+	RETURN (SELECT *
+			FROM dbo.Cirurgia 
+			WHERE @noUtenteSaude = noUtenteSaude
+			)
+GO
+--Teste
+SELECT * FROM getCirurgia(12345070);
