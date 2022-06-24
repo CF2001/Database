@@ -427,14 +427,12 @@ AS
 				-- Verificar se o medico tinha consulta marcada
 				SELECT @medico_consulta = COUNT (*) FROM Consulta WHERE func_ID_Medico = @func_ID;
 				IF @medico_consulta > 0	-- medico tem consulta
-				   UPDATE Consulta SET func_ID_Medico = NULL, noUtenteSaude = NULL, dataConsulta = NULL, hora = NULL WHERE func_ID_Medico = @func_ID;
+					DELETE FROM Consulta WHERE func_ID_Medico = @func_ID;
 
 				-- Verificar se o medico tinha cirurgia marcada
 				SELECT @medico_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE func_ID_Medico = @func_ID;
 				IF @medico_cirurgia > 0	-- medico tem cirurgia
-					UPDATE Cirurgia
-					SET tipoCirurgia = NULL, noUtenteSaude = NULL, dataCirurgia = NULL, Hora_Inicio = NULL, Duracao = NULL, EquipaM_ID = NULL, noBlocoOperatorio = NULL
-					WHERE EquipaM_ID = @equipa_cirurgia;
+					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
 
 				DELETE FROM Medico WHERE @func_ID = func_ID_Medico;
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;			
@@ -446,9 +444,7 @@ AS
 				--Verificar se o enfermeiro tinha cirurgia marcada
 				SELECT @enfermeiro_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE func_ID_Enf = @func_ID;
 				IF @enfermeiro_cirurgia > 0	-- enfermeiro tem cirurgia
-					UPDATE Cirurgia
-					SET tipoCirurgia = NULL, noUtenteSaude = NULL, dataCirurgia = NULL, Hora_Inicio = NULL, Duracao = NULL, EquipaM_ID = NULL, noBlocoOperatorio = NULL
-					WHERE EquipaM_ID = @equipa_cirurgia;
+					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
 				/*
 				--Verificar se supervisiona alguma cama
 				SELECT @enfermeiro_supervisiona = COUNT (*) FROM Enf_Supervisiona JOIN Cama_Hospital ON Enf_Supervisiona.ID_Cama = Cama_Hospital.ID_Cama WHERE func_ID_Enf = @func_ID AND Cama_Hospital.camaLivre = 1;
