@@ -408,7 +408,7 @@ SELECT * FROM Rececionista;
 /* Eliminar um Funcionário do sistema em função do seu func_ID */
 DROP PROC sp_eliminarFuncionario;
 GO 
-CREATE PROCEDURE sp_eliminarFuncionario (@func_ID INT)
+CREATE PROCEDURE sp_eliminarFuncionario (@func_ID INT, @new_super INT) --new_super é o ID do médico que irá substituir caso o que está a ser elimanado seja supervisor de uma equipa médica
 AS 
 	BEGIN
 		DECLARE @type AS CHAR(1);
@@ -416,14 +416,12 @@ AS
 		DECLARE @medico_cirurgia AS INT;
 		DECLARE @enfermeiro_cirurgia AS INT;
 		DECLARE @equipa_cirurgia AS INT;
-		DECLARE @enfermeiro_supervisiona AS INT;
-		DECLARE @enfermeiro_auxilia AS INT;
-
+		
 		SELECT @type = tipo FROM Funcionario WHERE @func_ID = func_ID;
-
+		SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
+		
 		IF @type = 'M'
 			BEGIN
-				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
 				-- Verificar se o medico tinha consulta marcada
 				SELECT @medico_consulta = COUNT (*) FROM Consulta WHERE func_ID_Medico = @func_ID;
 				IF @medico_consulta > 0	-- medico tem consulta
@@ -431,37 +429,29 @@ AS
 
 				-- Verificar se o medico tinha cirurgia marcada
 				SELECT @medico_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE func_ID_Medico = @func_ID;
-				IF @medico_cirurgia > 0	-- medico tem cirurgia
+				IF @medico_cirurgia > 0 
 					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
-
-				DELETE FROM Medico WHERE @func_ID = func_ID_Medico;
+				
+				IF (SELECT COUNT(*) FROM Equipa_Medica WHERE @func_ID = Super_func_ID_Medico) > 0
+					UPDATE Equipa_Medica SET Super_func_ID_Medico = @new_super WHERE equipaM_ID = @equipa_cirurgia;
+				
+				DELETE FROM EM_contemMed WHERE @func_ID = func_ID_Medico;
+				DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
+				DELETE FROM Especializacao_Medico WHERE @func_ID = func_ID_Medico;
+				DELETE FROM Medico WHERE @func_ID = Medico.func_ID_Medico;
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;			
 			END
 
 		ELSE IF @type = 'E'
 			BEGIN
-				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE @func_ID = func_ID_Enf;
 				--Verificar se o enfermeiro tinha cirurgia marcada
 				SELECT @enfermeiro_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE func_ID_Enf = @func_ID;
-				IF @enfermeiro_cirurgia > 0	-- enfermeiro tem cirurgia
+				IF @enfermeiro_cirurgia > 0
 					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
-				/*
-				--Verificar se supervisiona alguma cama
-				SELECT @enfermeiro_supervisiona = COUNT (*) FROM Enf_Supervisiona JOIN Cama_Hospital ON Enf_Supervisiona.ID_Cama = Cama_Hospital.ID_Cama WHERE func_ID_Enf = @func_ID AND Cama_Hospital.camaLivre = 1;
-				IF @enfermeiro_supervisiona > 0 --enfermeiro supervisiona
-					UPDATE Enf_Supervisiona
-					SET func_ID_Enf = NULL, ID_Cama = NULL
-					WHERE func_ID_Enf = @func_ID;
-
-				--Verificar se auxilia algum paciente
-				SELECT @enfermeiro_auxilia = COUNT (*) FROM Enf_Auxilia WHERE func_ID_Enf = @func_ID;
-				IF @enfermeiro_auxilia > 0
-					UPDATE Enf_Auxilia
-					SET func_ID_Enf = NULL, noUtenteSaude = NULL
-					WHERE func_ID_Enf = @func_ID;
-				*/
-				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_EnfS; --não tenho a certeza destes 2
+				
+				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_EnfS;
 				DELETE FROM Enf_Auxilia WHERE @func_ID = func_ID_Enf;
+				DELETE FROM EM_contemEnf WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Enfermeiro WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;
 			END
@@ -473,15 +463,37 @@ AS
 		END
 
 --Testes
-EXEC sp_eliminarFuncionario 25;
-SELECT * FROM Funcionario;
-SELECT * FROM Medico;
+SELECT * FROM Enf_Auxilia;
+SELECT * FROM Enf_Supervisiona;
+SELECT * FROM Cirurgia;
+SELECT * FROM EM_contemEnf;
+		
+INSERT INTO Enf_Auxilia VALUES (20, 12345070)
+INSERT INTO Enf_Supervisiona VALUES (20, 'A2')
+INSERT INTO Cirurgia VALUES ('Cirurgia cardiaca', '2022-7-02', '10h AM', '6h30', 1, 5, 66654311)
+INSERT INTO EM_contemEnf VALUES (20,1)
 
-EXEC sp_eliminarFuncionario 20;
+EXEC sp_eliminarFuncionario 20, NULL;
 SELECT * FROM Funcionario;
 SELECT * FROM Enfermeiro;
 
-EXEC sp_eliminarFuncionario 30;
+--Teste2
+SELECT * FROM Equipa_Medica;
+SELECT * FROM EM_contemMed;
+SELECT * FROM Consulta;
+
+INSERT INTO Medico VALUES (25, 3)
+INSERT INTO Equipa_Medica VALUES (5, 25)
+INSERT INTO EM_contemMed VALUES (25, 5)
+INSERT INTO EM_contemEnf VALUES (20, 5)
+INSERT INTO Cirurgia VALUES ('Cirurgia', '2022-7-02', '10h AM', '6h30', 5, 5, 22222730)
+INSERT INTO Consulta VALUES (25, 22222730, 5, '2022-06-20', '11h AM')
+
+EXEC sp_eliminarFuncionario 25, 12;
+SELECT * FROM Funcionario;
+SELECT * FROM Medico;
+
+EXEC sp_eliminarFuncionario 30, NULL;
 SELECT * FROM Funcionario;
 SELECT * FROM Rececionista;
 
@@ -567,3 +579,87 @@ END
 --Testes
 EXEC sp_updateInfoFuncionario 30, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 950, NULL;
 SELECT * FROM Funcionario;
+
+
+-- marcar uma cirurgia, utiliza o trigger para não deixar marcar mais que uma cirurgia no mesmo dia ao mesmo paciente
+DROP PROC schedule_surgery;
+GO
+CREATE PROC schedule_surgery (@tipoCirurgia CHAR(40), @dataCirurgia DATE, @horaInicio CHAR(10), @duracao CHAR(5), @equipaM_ID INT, @noBlocoOperatorio INT, 
+									@noUtenteSaude INT)
+AS
+BEGIN
+	IF DATEDIFF(DAY, @dataCirurgia, GETDATE()) > 0
+		BEGIN
+			RAISERROR('Data de cirurgia incorreta!', 16, 1);
+			RETURN;
+		END
+	IF (SELECT COUNT(*) FROM Equipa_Medica WHERE @equipaM_ID = equipaM_ID) != 1
+		BEGIN
+			RAISERROR('A equipa médica que selecionou para realizar a cirurgia não existe!', 16, 1);
+			RETURN;
+		END
+	ELSE IF (SELECT COUNT(*) FROM Bloco_Operatorio WHERE @noBlocoOperatorio = noBloco) != 1
+		BEGIN	
+			RAISERROR('O bloco operatório selecionado não existe!', 16, 1);
+			RETURN;
+		END
+	ELSE IF (SELECT COUNT(*) FROM Paciente WHERE @noUtenteSaude = noUtenteSaude) != 1
+		RAISERROR('O paciente selecionado para a cirurgia não existe!', 16, 1);
+		RETURN;
+	INSERT INTO Cirurgia VALUES (@tipoCirurgia, @dataCirurgia, @horaInicio, @duracao, @equipaM_ID, @noBlocoOperatorio, @noUtenteSaude)
+END
+
+--Teste
+SELECT * FROM Cirurgia;
+SELECT * FROM Equipa_Medica;
+EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 7, 7, 87969404
+EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 8, 87969404
+EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 7, 12345678
+EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 7, 87969404
+
+-- desmarcar uma consulta e as suas prescrições associadas
+DROP PROC delete_apointment;
+GO
+CREATE PROC delete_apointment (@noUtenteSaude INT, @noConsulta INT)
+AS
+BEGIN
+	IF (SELECT COUNT(*) FROM Paciente WHERE @noUtenteSaude = noUtenteSaude) != 1
+		BEGIN
+			RAISERROR('O paciente selecionado para a consulta não existe!', 16, 1);
+			RETURN;
+		END
+	ELSE
+		DELETE FROM Prescreve WHERE @noConsulta = noConsulta;
+		DELETE FROM Consulta WHERE @noConsulta = noConsulta;
+END
+
+--Teste
+INSERT INTO Prescreve VALUES (8, 4, 9821, 1)
+INSERT INTO Consulta VALUES (8, 12345070, 5, '2022-07-03', '3h PM')
+
+SELECT * FROM Consulta;
+EXEC delete_apointment 12345678, 5
+EXEC delete_apointment 12345070, 5
+DELETE FROM Prescreve WHERE 4 = noConsulta;
+DELETE FROM Consulta WHERE 4 = noConsulta;
+
+
+-- desmarcar uma cirurgia
+DROP PROC delete_surgery;
+GO
+CREATE PROC delete_surgery (@tipoCirurgia CHAR(40), @dataCirurgia DATE, @equipaM_ID INT, @noBlocoOperatorio INT, @noUtenteSaude INT)
+AS
+BEGIN
+	IF DATEDIFF(DAY, @dataCirurgia, GETDATE()) > 0
+		BEGIN
+			RAISERROR('Só pode desmarcar cirurgia por realizar!', 16, 1);
+			RETURN;
+		END
+	DELETE FROM Cirurgia WHERE tipoCirurgia = @tipoCirurgia AND dataCirurgia = @dataCirurgia AND equipaM_ID = @equipaM_ID AND noBlocoOperatorio = @noBlocoOperatorio AND noUtenteSaude = @noUtenteSaude;
+END
+
+--Teste
+SELECT * FROM Cirurgia;
+EXEC delete_surgery 'Cirurgia renal', '2022-7-02', 1, NULL, 87969404
+EXEC delete_surgery 'Cirurgia renal', '2022-7-02', 2, 7, 87969404
+EXEC delete_surgery 'Cirurgia renal', '2022-7-02', 1, 7, 87969404
