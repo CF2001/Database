@@ -7,28 +7,27 @@
 
 ### Initial interface
 
-![image](https://github.com/CF2001/Database/assets/84447852/b169a2f2-4e58-408d-a154-3893147f7695)
+![Captura de ecrã 2023-05-29 213957](https://github.com/CF2001/Database/assets/84447852/5fed2819-bda0-4dd2-bf3f-eb1143185df7)
 
 <br>
 
 ### Interface Patient Record
-![image](https://github.com/CF2001/Database/assets/84447852/c172aa23-3f92-4776-ae49-ee0dfb146ef7)
-
+![Captura de ecrã 2023-05-29 212452](https://github.com/CF2001/Database/assets/84447852/ea0a3490-e605-4a18-9d78-4628349aa06e)
 <br>
 
 ### Patient information interface
-![image](https://github.com/CF2001/Database/assets/84447852/42963ea3-a458-48de-bd2a-57b0b79b69b1)
+![Captura de ecrã 2023-05-29 212307](https://github.com/CF2001/Database/assets/84447852/a979a101-743c-405d-b20f-a4f4fddbef6c)
 
 <br>
 
 ### Room information interface
-![image](https://github.com/CF2001/Database/assets/84447852/bc6de4ea-bce1-418d-b128-6e2e802fbc3a)
 
+![Captura de ecrã 2023-05-29 212344](https://github.com/CF2001/Database/assets/84447852/db3e5eaf-7d46-4298-b3fd-112073358fc4)
 <br>
 
 ### Departmental information interface
-![image](https://github.com/CF2001/Database/assets/84447852/891eaa3d-65e6-4984-8efa-c15e1eb006bf)
 
+![Captura de ecrã 2023-05-29 212522](https://github.com/CF2001/Database/assets/84447852/8c5d6af5-037a-4bf5-b5e6-12b5ca2a0da5)
 
 <br>
 
