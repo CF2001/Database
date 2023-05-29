@@ -35,7 +35,7 @@
 
     ''''''' Informação Funcionários
     Private Sub F1bbt_staffInfo_Click(sender As Object, e As EventArgs) Handles F1bbt_staffInfo.Click
-        'switchPanel(infoFunc)
+        switchPanel(infoFuncionario)
     End Sub
 
     ''''''' Informação Consultas

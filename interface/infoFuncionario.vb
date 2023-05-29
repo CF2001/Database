@@ -5,14 +5,13 @@ Public Class infoFuncionario
     Dim currentFunc As Integer
 
     Private Sub Funcionario_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        CN = New SqlConnection("data source=LAPTOP-FJ506417\SQLEXPRESS;integrated security=True;initial catalog=Hospital_Management_System")
+        CN = New SqlConnection("data source=tcp:mednat.ieeta.pt\SQLSERVER,8101;integrated security=true;initial catalog=Hospital_Management_System")
         CMD = New SqlCommand
         CMD.Connection = CN
     End Sub
 
     Private Sub ShowListOfFuncionarios() Handles MyBase.Load
-        CMD.CommandType = CommandType.Text
-        CMD.Parameters.Clear()                  '''' Ver se é necessário
+
         CMD.CommandText = "SELECT * FROM Funcionario" '' for SQL statements
         CN.Open()
         '' DataReader !! 
@@ -128,7 +127,7 @@ Public Class infoFuncionario
         Finally
             CN.Close()
             ClearFields()
-            MsgBox("Dados do Paciente " + F.funcID + " atualizados.")
+            MsgBox("Dados do Funcionário " + F.funcID + " atualizados.")
         End Try
         CN.Close()
     End Sub
@@ -145,7 +144,7 @@ Public Class infoFuncionario
             ListBox1.Items.RemoveAt(ListBox1.SelectedIndex)
             If currentFunc = ListBox1.Items.Count Then currentFunc = ListBox1.Items.Count - 1
             If currentFunc = -1 Then
-                MsgBox("Não existem mais Pacientes")
+                MsgBox("Não existem mais Funcionários")
             Else
                 ShowInfoFuncionario()
             End If
@@ -164,7 +163,7 @@ Public Class infoFuncionario
         Try
             CMD.ExecuteNonQuery()
         Catch ex As Exception
-            Throw New Exception("Failed to delete patient in database. " & vbCrLf & "ERROR MESSAGE: " & vbCrLf & ex.Message)
+            Throw New Exception("Failed to delete funcionário in database. " & vbCrLf & "ERROR MESSAGE: " & vbCrLf & ex.Message)
         Finally
             CN.Close()
         End Try
@@ -184,7 +183,7 @@ Public Class infoFuncionario
                     Pode pesquisar o Funcionario pelo seu ID.")
         Else
             CMD.CommandType = CommandType.Text
-            CMD.CommandText = "SELECT * FROM Funcionario WHERE funcID = " + searchBar.Text
+            CMD.CommandText = "SELECT * FROM getFuncByID ( " + searchBar.Text + ")"
             CN.Open()
             '' DataReader !! 
             Dim RDR As SqlDataReader

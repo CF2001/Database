@@ -58,6 +58,7 @@ SELECT * FROM Paciente;
 SELECT * FROM Cama_Hospital;
 SELECT * FROM  getCamaHospitalBy_IDQuarto (2);
 
+
 /** Pesquisar os enfermeiros supervisores de um determinado quarto */
 DROP FUNCTION getEnfSupervisorBy_IDQuarto;
 GO
@@ -68,10 +69,19 @@ AS
 			WHERE ID_Quarto = @quartoID AND ID_Cama = ID_Cama_EnfS)
 GO
 
-SELECT * FROM Cama_Hospital;
-SELECT * FROM Enf_Supervisiona;
+
+/** Devolve uma lista de enfermeiros que não estão a supervisionar uma cama */
+DROP FUNCTION getEnfermeiros_naoS;
+GO
+CREATE FUNCTION getEnfermeiros_naoS() RETURNS TABLE
+AS 
+	RETURN (Select func_ID_Enf
+			From Enfermeiro LEFT OUTER JOIN Enf_Supervisiona ON func_ID_Enf = func_ID_EnfS
+			WHERE func_ID_EnfS is NULL)
+GO
+
 -- Teste
-SELECT * FROM getEnfSupervisorBy_IDQuarto (2);
+Select * FROM getEnfermeiros_naoS();
 
 
 /** Pesquisar um Departamento pelo seu nome **/
@@ -88,6 +98,7 @@ GO
 SELECT * FROM getDepartBy_Name('Emergência');
 
 
+
 /** Pesquisar um Funcionario em função do seu ID */
 DROP FUNCTION getFuncByID;
 GO 
@@ -102,6 +113,7 @@ GO
 -- Teste
 SELECT * FROM getFuncByID(3);
 
+
 /** Pesquisar uma Consulta pelo numero de Utente de Saude do Paciente **/
 DROP FUNCTION getConsulta;
 GO 
@@ -115,15 +127,17 @@ GO
 --Teste
 SELECT * FROM getConsulta(12345070);
 
+
 /** Pesquisar uma Cirurgia pelo numero de Utente de Saude do Paciente **/
 DROP FUNCTION getCirurgia;
 GO 
 CREATE FUNCTION getCirurgia (@noUtenteSaude INT ) RETURNS TABLE
 AS 
 	RETURN (SELECT *
-			FROM dbo.Cirurgia 
+			FROM Cirurgia 
 			WHERE @noUtenteSaude = noUtenteSaude
 			)
 GO
 --Teste
-SELECT * FROM getCirurgia(12345070);
+select * from Cirurgia
+SELECT * FROM getCirurgia(66654311);

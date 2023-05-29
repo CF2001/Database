@@ -460,11 +460,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\35191\\Documents\\UA\\3ºAno\\2ºSemestre\\BD\\projectBD\\interface\\projetoBD.vbproj",
+      "projectUniqueName": "D:\\MIECT UA\\UA\\3_Ano\\2ºSemestre\\BD\\projectBD\\projetoBD_P2G3\\interface\\projetoBD.vbproj",
       "projectName": "projetoBD",
-      "projectPath": "C:\\Users\\35191\\Documents\\UA\\3ºAno\\2ºSemestre\\BD\\projectBD\\interface\\projetoBD.vbproj",
+      "projectPath": "D:\\MIECT UA\\UA\\3_Ano\\2ºSemestre\\BD\\projectBD\\projetoBD_P2G3\\interface\\projetoBD.vbproj",
       "packagesPath": "C:\\Users\\35191\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\35191\\Documents\\UA\\3ºAno\\2ºSemestre\\BD\\projectBD\\interface\\obj\\",
+      "outputPath": "D:\\MIECT UA\\UA\\3_Ano\\2ºSemestre\\BD\\projectBD\\projetoBD_P2G3\\interface\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

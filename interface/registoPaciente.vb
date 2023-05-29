@@ -7,7 +7,9 @@ Public Class registoPaciente
 
     ' Connection to database Hospital Management System
     Private Sub InfoPatients_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        CN = New SqlConnection("data source=LAPTOP-4HV6V7EN\SQLEXPRESS;integrated security=true;initial catalog=Hospital_Management_System")
+        'LAPTOP-4HV6V7EN\SQLEXPRESS
+        ' tcp:mednat.ieeta.pt\SQLSERVER,8101
+        CN = New SqlConnection("data source=tcp:mednat.ieeta.pt\SQLSERVER,8101;integrated security=true;initial catalog=Hospital_Management_System")
         CMD = New SqlCommand
         CMD.Connection = CN
     End Sub

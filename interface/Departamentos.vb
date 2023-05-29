@@ -5,8 +5,11 @@ Public Class Departamentos
     Dim CN As SqlConnection
     Dim CMD As SqlCommand
     Dim currentDept As Integer = 0
-    Private Sub InfoDep_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        CN = New SqlConnection("data source=LAPTOP-4HV6V7EN\SQLEXPRESS;integrated security=true;initial catalog=Hospital_Management_System")
+
+
+    ' Connection to database Hospital Management System
+    Private Sub InfoPatients_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        CN = New SqlConnection("data source=tcp:mednat.ieeta.pt\SQLSERVER,8101;integrated security=true;initial catalog=Hospital_Management_System")
         CMD = New SqlCommand
         CMD.Connection = CN
     End Sub
@@ -19,8 +22,6 @@ Public Class Departamentos
         lv_Departamentos.GridLines = True
         lv_Departamentos.ShowGroups = False
 
-
-        CMD.CommandType = CommandType.Text
         CMD.CommandText = "SELECT * FROM Departamento"
         CN.Open()
         '' DataReader !! 

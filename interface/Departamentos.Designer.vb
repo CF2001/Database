@@ -60,9 +60,9 @@ Partial Class Departamentos
         '
         Me.lv_Departamentos.BackColor = System.Drawing.SystemColors.MenuBar
         Me.lv_Departamentos.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3})
-        Me.lv_Departamentos.Location = New System.Drawing.Point(306, 91)
+        Me.lv_Departamentos.Location = New System.Drawing.Point(304, 87)
         Me.lv_Departamentos.Name = "lv_Departamentos"
-        Me.lv_Departamentos.Size = New System.Drawing.Size(463, 295)
+        Me.lv_Departamentos.Size = New System.Drawing.Size(480, 322)
         Me.lv_Departamentos.TabIndex = 1
         Me.lv_Departamentos.UseCompatibleStateImageBehavior = False
         Me.lv_Departamentos.View = System.Windows.Forms.View.Details

@@ -28,7 +28,10 @@ AS
 				FROM Cama_Hospital 
 				WHERE (camaOcupada = 1 AND ID_Quarto = @quartoID);
 
-				SELECT @noCamasQuarto = noCamas FROM Quarto_Hospital;
+				-- Ir buscar o número de camas de um determinado quarto
+				SELECT @noCamasQuarto = noCamas 
+				FROM Quarto_Hospital
+				WHERE ID_Quarto = @quartoID;
 
 				IF @noCamasOcupapas <  @noCamasQuarto
 					BEGIN
@@ -41,21 +44,18 @@ AS
 						WHERE (ID_Quarto = @quartoID AND camaOcupada = 0);
 					END
 				ELSE 
-					raiserror('ERRO: Todas as camas do Quarto inserido ocupadas. Por favor insira outro quarto', 20, -1) with log
+					raiserror('ERRO: Todas as camas do Quarto inserido ocupadas. Por favor insira outro quarto', 20, -1) 
+
 			END
 	END
 
 Select * from Paciente;
 Select * from Cama_Hospital;
+Select * from Enf_Supervisiona;
 
 -- Teste 
-EXEC sp_registoFuncionario 20, 'Maria', 'Mendes', 'F', 'Rua J', '1970-03-14', 'mariamendes@gmail.com', 917483921, 1000, 'E', 2, NULL;
-SELECT * FROM Funcionario;
-SELECT * FROM Enfermeiro;
-EXEC sp_registoFuncionario 20, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
-EXEC sp_registoFuncionario 25, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
-SELECT * FROM Funcionario;
-SELECT * FROM Medico;
+EXEC sp_registoPaciente 111132, 'Maria', 'Mendes', '1970-03-14', 'F', '917483921', 1, NULL, NULL, NULL;	-- Paciente não internado
+EXEC sp_registoPaciente 7429743, 'Vitor', 'Silveira', '2001-03-14', 'M', '917482920', 1, 2, '2022-06-17', NULL;	-- Paciente Internado
 
 
 /* Eliminar um Paciente do sistema em função do seu noUtendeSaude */ 
@@ -136,7 +136,7 @@ CREATE PROCEDURE sp_updateInfoPaciente (@noUtenteSaude INT, @firstName CHAR(15),
 									@rececionistaID INT, @quartoID INT, @dataEntrada DATE, @dataSaida DATE)
 AS
 	BEGIN 
-		BEGIN TRANSACTION
+		BEGIN TRANSACTION 
 		SET NOCOUNT ON
 
 		BEGIN TRY
@@ -202,7 +202,7 @@ AS
 							WHERE (ID_Quarto = @quartoID AND camaOcupada = 0);
 						END
 					ELSE 
-						raiserror('ERRO: Todas as camas do Quarto inserido ocupadas. Por favor insira outro quarto', 20, -1) with log
+						raiserror('ERRO: Todas as camas do Quarto inserido ocupadas. Por favor insira outro quarto', 20, -1) 
 
 					-- O Paciente altera de quarto, sendo que o quarto antigo passa a ter uma cama livre 
 					IF @OLD_quartoID is not NULL
@@ -325,7 +325,7 @@ EXEC UpdatePaciente_Internado  22222730, '2022-06-22', '2022-07-22', 6;
 
 
 /*** Atualização da data de Entrada e Saida de um Paciente internado **/
-DROP UpdateDadosPaciente_Internado;
+DROP PROC UpdateDadosPaciente_Internado;
 GO
 CREATE PROCEDURE UpdateDadosPaciente_Internado (@noUtenteSaude INT, @dataEntrada DATE, @dataSaida DATE)
 AS 
@@ -354,46 +354,88 @@ SELECT * FROM Paciente;
 SELECT * FROM Cama_Hospital;
 EXEC UpdateDadosPaciente_Internado  22222730, '2022-06-22', NULL;
 
+
+/** Adionar um Enfermeiro à lista de enfermeiros Supervisores + a cama que está a supervisionar */
+DROP PROC sp_addEnfermeiroS;
+GO
+CREATE PROCEDURE sp_addEnfermeiroS (@func_ID_EnfS AS INT, @ID_Cama_EnfS AS CHAR(20))
+AS 
+	BEGIN
+		INSERT INTO Enf_Supervisiona VALUES (@func_ID_EnfS, @ID_Cama_EnfS);
+	END
+GO
+--Teste 
+EXEC sp_addEnfermeiroS 15, 'A1';
+
+
+/** Remover um Enfermeiro à lista de enfermeiros Supervisores + a cama que está a supervisionar */
+DROP PROC sp_removeEnfermeiroS;
+GO
+CREATE PROCEDURE sp_removeEnfermeiroS (@func_ID_EnfS AS INT)
+AS 
+	BEGIN
+		DELETE FROM Enf_Supervisiona Where func_ID_EnfS = @func_ID_EnfS;
+	END
+GO
+
+Select * from Enf_Supervisiona;
+--Teste 
+EXEC sp_removeEnfermeiroS 15;
+
+
 ------------------------------------------------------ FUNCIONÁRIO ------------------------------------------------------------------
 
-
-/* Inserir um Funcionário no sistema do Hospital  */
 DROP PROC sp_registoFuncionario;
-GO 
-CREATE PROCEDURE sp_registoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE, 
-										@email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1), @deptID SMALLINT, @balcao CHAR(1))
-AS 
+GO
+CREATE PROCEDURE sp_registoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE,
+                                      @email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1), @deptID SMALLINT, @balcao CHAR(1))
+AS
 BEGIN
+        DECLARE @getID AS INT;
 
-	DECLARE	@getID AS INT;
+        SELECT @getID = COUNT(*) FROM Funcionario WHERE @funcID = func_ID;
 
-	SELECT @getID = COUNT(*) FROM Funcionario WHERE @funcID = func_ID;
+        IF @getID = 1
+                BEGIN
+                        RAISERROR('ERRO: Já existe um funcionário com esse ID!', 16, 1) ;
+                END
+        ELSE
+                IF @tipo = 'M'
+                        BEGIN
+								-- Funcionário
+                                INSERT INTO Funcionario 
+								VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
+								
+								-- Medico
+								INSERT INTO Medico VALUES  (@funcID, @deptID);
+                                
+								PRINT 'Sucess';
+                        END
 
-	IF @getID = 1 
-		BEGIN
-			RAISERROR('ERRO: Já existe um funcionário com esse ID!', 16, 1) WITH LOG;
-		END
-	ELSE
-		IF @tipo = 'M'
-			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
-				INSERT INTO Medico VALUES  (@funcID, @deptID);
-				PRINT 'Sucess';
-			END
-		ELSE IF @tipo = 'E'
-			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
-				INSERT INTO Enfermeiro VALUES  (@funcID, @deptID);
-				PRINT 'Sucess';
-			END
-		ELSE
-			BEGIN
-				INSERT INTO Funcionario VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
-				INSERT INTO Rececionista VALUES  (@funcID, @balcao);
-				PRINT 'Sucess';
-			END
+                ELSE IF @tipo = 'E'
+                        BEGIN
+								-- Funcionário
+                                INSERT INTO Funcionario 
+								VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
+								
+								-- Enfermeiro
+								INSERT INTO Enfermeiro VALUES  (@funcID, @deptID);
+                                
+								PRINT 'Sucess';
+                        END
+
+                ELSE
+                        BEGIN
+                                INSERT INTO Funcionario 
+								VALUES  (@funcID, @primeiroNome, @ultimoNome, @genero, @morada, @dataNascimento, @email, @telefone, @salary, @tipo);
+                                
+								INSERT INTO Rececionista VALUES  (@funcID, @balcao);
+                                
+								PRINT 'Sucess';
+                        END
 END
 
+-- Teste 
 EXEC sp_registoFuncionario 20, 'Maria', 'Mendes', 'F', 'Rua J', '1970-03-14', 'mariamendes@gmail.com', 917483921, 1000, 'E', 2, NULL;
 SELECT * FROM Funcionario;
 SELECT * FROM Enfermeiro;
@@ -401,14 +443,15 @@ EXEC sp_registoFuncionario 20, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 
 EXEC sp_registoFuncionario 25, 'Vitor', 'Silveira', 'M', 'Rua M', '2001-03-14', 'vs@gmail.com', 917483946, 1500, 'M', 3, NULL;
 SELECT * FROM Funcionario;
 SELECT * FROM Medico;
-EXEC sp_registoFuncionario 30, 'Miranda', 'Sousa', 'F', 'Rua M', '1999-03-14', 'miranda@gmail.com', 917452946, 900, 'F', NULL, 'B';
+EXEC sp_registoFuncionario 30, 'Miranda', 'Sousa', 'F', 'Rua M', '1999-03-14', 'miranda@gmail.com', 917452946, 900, 'R', NULL, 'B';
 SELECT * FROM Funcionario;
 SELECT * FROM Rececionista;
+
 
 /* Eliminar um Funcionário do sistema em função do seu func_ID */
 DROP PROC sp_eliminarFuncionario;
 GO 
-CREATE PROCEDURE sp_eliminarFuncionario (@func_ID INT, @new_super INT) --new_super é o ID do médico que irá substituir caso o que está a ser elimanado seja supervisor de uma equipa médica
+CREATE PROCEDURE sp_eliminarFuncionario (@func_ID INT)
 AS 
 	BEGIN
 		DECLARE @type AS CHAR(1);
@@ -416,12 +459,14 @@ AS
 		DECLARE @medico_cirurgia AS INT;
 		DECLARE @enfermeiro_cirurgia AS INT;
 		DECLARE @equipa_cirurgia AS INT;
-		
+		DECLARE @enfermeiro_supervisiona AS INT;
+		DECLARE @enfermeiro_auxilia AS INT;
+
 		SELECT @type = tipo FROM Funcionario WHERE @func_ID = func_ID;
-		SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
-		
+
 		IF @type = 'M'
 			BEGIN
+				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE @func_ID = func_ID_Medico;
 				-- Verificar se o medico tinha consulta marcada
 				SELECT @medico_consulta = COUNT (*) FROM Consulta WHERE func_ID_Medico = @func_ID;
 				IF @medico_consulta > 0	-- medico tem consulta
@@ -429,29 +474,38 @@ AS
 
 				-- Verificar se o medico tinha cirurgia marcada
 				SELECT @medico_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemMed ON Cirurgia.EquipaM_ID = EM_contemMed.EquipaM_ID WHERE func_ID_Medico = @func_ID;
-				IF @medico_cirurgia > 0 
+				IF @medico_cirurgia > 0	-- medico tem cirurgia
 					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
-				
-				IF (SELECT COUNT(*) FROM Equipa_Medica WHERE @func_ID = Super_func_ID_Medico) > 0
-					UPDATE Equipa_Medica SET Super_func_ID_Medico = @new_super WHERE equipaM_ID = @equipa_cirurgia;
-				
+
 				DELETE FROM EM_contemMed WHERE @func_ID = func_ID_Medico;
-				DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
-				DELETE FROM Especializacao_Medico WHERE @func_ID = func_ID_Medico;
-				DELETE FROM Medico WHERE @func_ID = Medico.func_ID_Medico;
-				DELETE FROM Funcionario WHERE @func_ID = func_ID;			
+				DELETE FROM Equipa_Medica WHERE @func_ID = Super_func_ID_Medico;
+				DELETE FROM Medico WHERE @func_ID = func_ID_Medico;
+				DELETE FROM Funcionario WHERE @func_ID = func_ID;	
 			END
 
 		ELSE IF @type = 'E'
 			BEGIN
+				SELECT @equipa_cirurgia = Cirurgia.EquipaM_ID FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE @func_ID = func_ID_Enf;
 				--Verificar se o enfermeiro tinha cirurgia marcada
 				SELECT @enfermeiro_cirurgia = COUNT (*) FROM Cirurgia JOIN EM_contemEnf ON Cirurgia.EquipaM_ID = EM_contemEnf.EquipaM_ID WHERE func_ID_Enf = @func_ID;
-				IF @enfermeiro_cirurgia > 0
+				IF @enfermeiro_cirurgia > 0	-- enfermeiro tem cirurgia
 					DELETE FROM Cirurgia WHERE EquipaM_ID = @equipa_cirurgia;
-				
-				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_EnfS;
+				/*
+				--Verificar se supervisiona alguma cama
+				SELECT @enfermeiro_supervisiona = COUNT (*) FROM Enf_Supervisiona JOIN Cama_Hospital ON Enf_Supervisiona.ID_Cama = Cama_Hospital.ID_Cama WHERE func_ID_Enf = @func_ID AND Cama_Hospital.camaLivre = 1;
+				IF @enfermeiro_supervisiona > 0 --enfermeiro supervisiona
+					UPDATE Enf_Supervisiona
+					SET func_ID_Enf = NULL, ID_Cama = NULL
+					WHERE func_ID_Enf = @func_ID;
+				--Verificar se auxilia algum paciente
+				SELECT @enfermeiro_auxilia = COUNT (*) FROM Enf_Auxilia WHERE func_ID_Enf = @func_ID;
+				IF @enfermeiro_auxilia > 0
+					UPDATE Enf_Auxilia
+					SET func_ID_Enf = NULL, noUtenteSaude = NULL
+					WHERE func_ID_Enf = @func_ID;
+				*/
+				DELETE FROM Enf_Supervisiona WHERE @func_ID = func_ID_EnfS; 
 				DELETE FROM Enf_Auxilia WHERE @func_ID = func_ID_Enf;
-				DELETE FROM EM_contemEnf WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Enfermeiro WHERE @func_ID = func_ID_Enf;
 				DELETE FROM Funcionario WHERE @func_ID = func_ID;
 			END
@@ -463,125 +517,97 @@ AS
 		END
 
 --Testes
-SELECT * FROM Enf_Auxilia;
-SELECT * FROM Enf_Supervisiona;
-SELECT * FROM Cirurgia;
-SELECT * FROM EM_contemEnf;
-		
-INSERT INTO Enf_Auxilia VALUES (20, 12345070)
-INSERT INTO Enf_Supervisiona VALUES (20, 'A2')
-INSERT INTO Cirurgia VALUES ('Cirurgia cardiaca', '2022-7-02', '10h AM', '6h30', 1, 5, 66654311)
-INSERT INTO EM_contemEnf VALUES (20,1)
-
-EXEC sp_eliminarFuncionario 20, NULL;
-SELECT * FROM Funcionario;
-SELECT * FROM Enfermeiro;
-
---Teste2
-SELECT * FROM Equipa_Medica;
-SELECT * FROM EM_contemMed;
-SELECT * FROM Consulta;
-
-INSERT INTO Medico VALUES (25, 3)
-INSERT INTO Equipa_Medica VALUES (5, 25)
-INSERT INTO EM_contemMed VALUES (25, 5)
-INSERT INTO EM_contemEnf VALUES (20, 5)
-INSERT INTO Cirurgia VALUES ('Cirurgia', '2022-7-02', '10h AM', '6h30', 5, 5, 22222730)
-INSERT INTO Consulta VALUES (25, 22222730, 5, '2022-06-20', '11h AM')
-
-EXEC sp_eliminarFuncionario 25, 12;
+EXEC sp_eliminarFuncionario 4;
 SELECT * FROM Funcionario;
 SELECT * FROM Medico;
 
-EXEC sp_eliminarFuncionario 30, NULL;
+EXEC sp_eliminarFuncionario 20;
+SELECT * FROM Funcionario;
+SELECT * FROM Enfermeiro;
+
+EXEC sp_eliminarFuncionario 30;
 SELECT * FROM Funcionario;
 SELECT * FROM Rececionista;
 
-/* Atualizar os dados de um Funcionário no Sistema.	*/
+
+/* Atualizar os dados de um Funcionário no Sistema.  */
+
 DROP PROC sp_updateInfoFuncionario;
-GO 
-CREATE PROCEDURE sp_updateInfoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE, 
-										@email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1))
+ 
+GO
+CREATE PROCEDURE sp_updateInfoFuncionario (@funcID INT, @primeiroNome CHAR(15), @ultimoNome CHAR(15), @genero CHAR(1), @morada CHAR(40), @dataNascimento DATE,
+                                                                                @email CHAR(30), @telefone CHAR(9), @salary SMALLMONEY, @tipo CHAR(1))
 AS
-BEGIN 
-	BEGIN TRY
-		BEGIN TRANSACTION
-		SET NOCOUNT ON
-			DECLARE @funcID_old AS INT;
-			DECLARE @primeiroNome_old AS CHAR(15);
-			DECLARE @ultimoNome_old AS CHAR(15);
-			DECLARE @dataNascimento_old AS DATE;
-			DECLARE @genero_old AS CHAR(1);
-			DECLARE @telefone_old AS CHAR(9);
-			DECLARE @morada_old AS CHAR(40);
-			DECLARE @salary_old AS SMALLMONEY;
-			DECLARE @email_old AS CHAR(30);
+BEGIN
+        BEGIN TRY
+                BEGIN TRANSACTION
+                SET NOCOUNT ON
+                        DECLARE @funcID_old AS INT;
+                        DECLARE @primeiroNome_old AS CHAR(15);
+                        DECLARE @ultimoNome_old AS CHAR(15);
+                        DECLARE @dataNascimento_old AS DATE;
+                        DECLARE @genero_old AS CHAR(1);
+                        DECLARE @telefone_old AS CHAR(9);
+                        DECLARE @morada_old AS CHAR(40);
+                        DECLARE @salary_old AS SMALLMONEY;
+                        DECLARE @email_old AS CHAR(30);
 
-			SELECT @funcID_old = func_ID, @primeiroNome_old = primeiroNome, @ultimoNome_old = ultimoNome, @dataNascimento_old = dataNascimento, 
-			@genero_old = genero, @telefone_old = noTelefone, @morada_old = morada, @salary_old = salary, @email_old = email
-			FROM Funcionario
-			WHERE func_ID = @funcID;
-
-			IF @funcID != @funcID_old
-			BEGIN
-				UPDATE Funcionario SET func_ID = @funcID WHERE func_ID = @funcID_old;
-			END
-
-			IF @primeiroNome != @primeiroNome_old
-			BEGIN
-				UPDATE Funcionario SET primeiroNome = @primeiroNome WHERE func_ID = @funcID_old;
-			END
-
-			IF @ultimoNome != @ultimoNome_old
-			BEGIN
-				UPDATE Funcionario SET ultimoNome = @ultimoNome WHERE func_ID = @funcID_old;
-			END
-
-			IF @dataNascimento != @dataNascimento_old
-			BEGIN
-				UPDATE Funcionario SET dataNascimento = @dataNascimento WHERE func_ID = @funcID_old;
-			END
-
-			IF @genero != @genero_old
-			BEGIN
-				UPDATE Funcionario SET genero = @genero WHERE func_ID = @funcID_old;
-			END
-
-			IF @telefone != @telefone_old
-			BEGIN
-				UPDATE Funcionario SET noTelefone = @telefone WHERE func_ID = @funcID_old;
-			END
-
-			IF @morada != @morada_old
-			BEGIN
-				UPDATE Funcionario SET morada = @morada WHERE func_ID = @funcID_old;
-			END
-
-			IF @salary != @salary_old
-			BEGIN
-				UPDATE Funcionario SET salary = @salary WHERE func_ID = @funcID_old;
-			END
-
-			IF @email != @email_old
-			BEGIN
-				UPDATE Funcionario SET email = @email WHERE func_ID = @funcID_old;
-			END
-			
-			COMMIT TRANSACTION
-		END TRY
-
-		BEGIN CATCH
-			PRINT ERROR_MESSAGE()
-			ROLLBACK
-		END CATCH	
-END 
-
+                        SELECT @funcID_old = func_ID, @primeiroNome_old = primeiroNome, @ultimoNome_old = ultimoNome, @dataNascimento_old = dataNascimento,
+                        @genero_old = genero, @telefone_old = noTelefone, @morada_old = morada, @salary_old = salary, @email_old = email
+                        FROM Funcionario
+                        WHERE func_ID = @funcID;
+                        
+						
+						IF @funcID != @funcID_old
+                        BEGIN
+                                UPDATE Funcionario SET func_ID = @funcID WHERE func_ID = @funcID_old;
+                        END
+                        IF @primeiroNome != @primeiroNome_old
+                        BEGIN
+                                UPDATE Funcionario SET primeiroNome = @primeiroNome WHERE func_ID = @funcID_old;
+                        END
+                        IF @ultimoNome != @ultimoNome_old
+                        BEGIN
+                                UPDATE Funcionario SET ultimoNome = @ultimoNome WHERE func_ID = @funcID_old;
+                        END
+                        IF @dataNascimento != @dataNascimento_old
+                        BEGIN
+                                UPDATE Funcionario SET dataNascimento = @dataNascimento WHERE func_ID = @funcID_old;
+                        END
+                        IF @genero != @genero_old
+                        BEGIN
+                                UPDATE Funcionario SET genero = @genero WHERE func_ID = @funcID_old;
+                        END
+                        IF @telefone != @telefone_old
+                        BEGIN
+                                UPDATE Funcionario SET noTelefone = @telefone WHERE func_ID = @funcID_old;
+                        END
+                        IF @morada != @morada_old
+                        BEGIN
+                                UPDATE Funcionario SET morada = @morada WHERE func_ID = @funcID_old;
+                        END
+                        IF @salary != @salary_old
+                        BEGIN
+                                UPDATE Funcionario SET salary = @salary WHERE func_ID = @funcID_old;
+                        END
+                        IF @email != @email_old
+                        BEGIN
+                                UPDATE Funcionario SET email = @email WHERE func_ID = @funcID_old;
+                        END
+                        
+                        COMMIT TRANSACTION
+                END TRY
+                BEGIN CATCH
+                        PRINT ERROR_MESSAGE()
+                        ROLLBACK
+                END CATCH        
+END
 --Testes
-EXEC sp_updateInfoFuncionario 30, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 950, NULL;
+EXEC sp_updateInfoFuncionario 20, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 950, NULL;
 SELECT * FROM Funcionario;
 
 
--- marcar uma cirurgia, utiliza o trigger para não deixar marcar mais que uma cirurgia no mesmo dia ao mesmo paciente
+/** Marcar uma cirurgia, utiliza o trigger para não deixar marcar mais que uma cirurgia no mesmo dia ao mesmo paciente	*/
 DROP PROC schedule_surgery;
 GO
 CREATE PROC schedule_surgery (@tipoCirurgia CHAR(40), @dataCirurgia DATE, @horaInicio CHAR(10), @duracao CHAR(5), @equipaM_ID INT, @noBlocoOperatorio INT, 
@@ -617,7 +643,8 @@ EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 8, 879
 EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 7, 12345678
 EXEC schedule_surgery 'Cirurgia renal', '2022-7-02', '10h AM', '6h30', 1, 7, 87969404
 
--- desmarcar uma consulta e as suas prescrições associadas
+
+/** desmarcar uma consulta e as suas prescrições associadas **/
 DROP PROC delete_apointment;
 GO
 CREATE PROC delete_apointment (@noUtenteSaude INT, @noConsulta INT)

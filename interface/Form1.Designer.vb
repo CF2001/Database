@@ -80,7 +80,7 @@ Partial Class Form1
         Me.Panel1.Controls.Add(Me.PictureBox1)
         Me.Panel1.Location = New System.Drawing.Point(243, 28)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1344, 750)
+        Me.Panel1.Size = New System.Drawing.Size(1610, 750)
         Me.Panel1.TabIndex = 4
         '
         'PictureBox1
@@ -132,7 +132,7 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1599, 790)
+        Me.ClientSize = New System.Drawing.Size(1892, 790)
         Me.Controls.Add(Me.bttn_infoCirurgia)
         Me.Controls.Add(Me.bttn_infoConsultas)
         Me.Controls.Add(Me.bttn_infoDep)

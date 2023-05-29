@@ -4,24 +4,24 @@
 -- (func_ID, primeiroNome, ultimoNome, genero, morada, dataNascimento, email, noTelefone, salary)
 
 -- RECECIONISTAS
-INSERT INTO Funcionario VALUES (1, 'Miguel', 'Ferreira', 'M', 'Rua da FRENTE', '1970-08-11','miguelF@gmail.com', 911222333, 819.50)
+INSERT INTO Funcionario VALUES (1, 'Miguel', 'Ferreira', 'M', 'Rua da FRENTE', '1970-08-11','miguelF@gmail.com', 911222333, 819.50, 'R')
 -- ENFERMEIROS
-INSERT INTO Funcionario VALUES (2, 'Maria', 'Sousa', 'F', 'Rua XPTO', '1980-01-01','mariaS@gmail.com', 911333444, 2000)	
-INSERT INTO Funcionario VALUES (3, 'Juliana', 'Gomes', 'F', 'Rua A', '1980-08-11','julianaG@gmail.com', 922666777, 2000)		
-INSERT INTO Funcionario VALUES (10, 'Catarina', 'Martins', 'F', 'Rua XW', '1970-01-15','catarinaM@gmail.com', 936732111, 2000)
-INSERT INTO Funcionario VALUES (11, 'Diana', 'Rosa', 'F', 'Rua HH', '1965-01-15','dianaR@gmail.com', 944555666, 2000)	
-INSERT INTO Funcionario VALUES (15, 'Eduardo', 'Fernades', 'M', 'Rua ED', '1965-06-20','eduardoF@gmail.com', 918780101, 2000)
-INSERT INTO Funcionario VALUES (16, 'Diogo', 'Gomes', 'M', 'Rua DI', '1965-11-15','diogoG@gmail.com', 944555666, 2000)
+INSERT INTO Funcionario VALUES (2, 'Maria', 'Sousa', 'F', 'Rua XPTO', '1980-01-01','mariaS@gmail.com', 911333444, 2000, 'E')	
+INSERT INTO Funcionario VALUES (3, 'Juliana', 'Gomes', 'F', 'Rua A', '1980-08-11','julianaG@gmail.com', 922666777, 2000, 'E')		
+INSERT INTO Funcionario VALUES (10, 'Catarina', 'Martins', 'F', 'Rua XW', '1970-01-15','catarinaM@gmail.com', 936732111, 2000, 'E')
+INSERT INTO Funcionario VALUES (11, 'Diana', 'Rosa', 'F', 'Rua HH', '1965-01-15','dianaR@gmail.com', 944555666, 2000, 'E')	
+INSERT INTO Funcionario VALUES (15, 'Eduardo', 'Fernades', 'M', 'Rua ED', '1965-06-20','eduardoF@gmail.com', 918780101, 2000, 'E')
+INSERT INTO Funcionario VALUES (16, 'Diogo', 'Gomes', 'M', 'Rua DI', '1965-11-15','diogoG@gmail.com', 944555666, 2000, 'E')
 -- MEDICOS
-INSERT INTO Funcionario VALUES (4, 'Joao', 'Pereira', 'M', 'Rua B ', '1977-05-01','joaoP@gmail.com', 911222999,3223)		
-INSERT INTO Funcionario VALUES (5, 'Ana', 'Silva', 'F', 'Rua C', '1969-01-01','anaS@gmail.com', 911555333, 5932.50)			
-INSERT INTO Funcionario VALUES (6, 'Mariana', 'Costa', 'F', 'Rua D', '1990-03-03','marianaC@gmail.com', 968123123, 2637.50)  
-INSERT INTO Funcionario VALUES (7, 'Ricardo', 'Amaral', 'M', 'Rua E', '1968-01-15','ricardoA@gmail.com', 936732111, 4029.50)	
-INSERT INTO Funcionario VALUES (8, 'Manuel', 'Santos', 'M', 'Rua XP', '2000-01-15','manuelS@gmail.com', 918999333, 2738.60)	
-INSERT INTO Funcionario VALUES (9, 'Silvia', 'Pombo', 'F', 'Rua XY', '2000-04-15','silviaP@gmail.com', 918882921, 4839)
-INSERT INTO Funcionario VALUES (12, 'Adriano', 'Santos', 'M', 'Rua OO', '1970-07-15','adriano@gmail.com', 937900111, 4839)
-INSERT INTO Funcionario VALUES (13, 'Alice', 'Silva', 'F', 'Rua VV', '1969-11-15','alice@gmail.com', 927891011, 4839)
-INSERT INTO Funcionario VALUES (14, 'Andre', 'Fernandes', 'M', 'Rua EE', '1967-12-15','andre@gmail.com', 910003456, 4839)
+INSERT INTO Funcionario VALUES (4, 'Joao', 'Pereira', 'M', 'Rua B ', '1977-05-01','joaoP@gmail.com', 911222999,3223, 'M')		
+INSERT INTO Funcionario VALUES (5, 'Ana', 'Silva', 'F', 'Rua C', '1969-01-01','anaS@gmail.com', 911555333, 5932.50, 'M')			
+INSERT INTO Funcionario VALUES (6, 'Mariana', 'Costa', 'F', 'Rua D', '1990-03-03','marianaC@gmail.com', 968123123, 2637.50, 'M')  
+INSERT INTO Funcionario VALUES (7, 'Ricardo', 'Amaral', 'M', 'Rua E', '1968-01-15','ricardoA@gmail.com', 936732111, 4029.50, 'M')	
+INSERT INTO Funcionario VALUES (8, 'Manuel', 'Santos', 'M', 'Rua XP', '2000-01-15','manuelS@gmail.com', 918999333, 2738.60, 'M')	
+INSERT INTO Funcionario VALUES (9, 'Silvia', 'Pombo', 'F', 'Rua XY', '2000-04-15','silviaP@gmail.com', 918882921, 4839, 'M')
+INSERT INTO Funcionario VALUES (12, 'Adriano', 'Santos', 'M', 'Rua OO', '1970-07-15','adriano@gmail.com', 937900111, 4839, 'M')
+INSERT INTO Funcionario VALUES (13, 'Alice', 'Silva', 'F', 'Rua VV', '1969-11-15','alice@gmail.com', 927891011, 4839, 'M')
+INSERT INTO Funcionario VALUES (14, 'Andre', 'Fernandes', 'M', 'Rua EE', '1967-12-15','andre@gmail.com', 910003456, 4839, 'M')
 
 -- Departamento 
 -- (nome_dept, ID_dept, ID_supervisor_dept)
@@ -211,7 +211,6 @@ INSERT INTO Bloco_Operatorio VALUES (7,0)
 -- (tipoCirurgia, dataCirurgia, Hora_Inicio, Duracao, EquipaM_ID, noBlocoOperatorio, noUtenteSaude)
 INSERT INTO Cirurgia VALUES ('Cirurgia cardiaca', '2022-7-02', '10h AM', '6h30', 1, 5, 66654311)
 INSERT INTO Cirurgia VALUES ('Cirurgia neurologica', '2022-7-10', '2h30 PM', '12h',2, 7, 22222730)
-INSERT INTO Cirurgia VALUES ('Cirurgia torácica', '2022-8-19', '8h30 AM', '7h', 1, 3, 66654311 )
 
 
 -- EM_contemEnf
@@ -232,5 +231,5 @@ INSERT INTO EM_contemMed VALUES (4, 2)
 
 -- TESTES 
 -- DELETE FROM Cama_Hospital;
---SELECT * FROM Paciente;
+-- SELECT * FROM Paciente;
 --DELETE FROM Paciente WHERE noUtenteSaude=1237858;

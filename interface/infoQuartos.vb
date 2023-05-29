@@ -12,7 +12,7 @@ Public Class infoQuartos
 
     ' Connection to database Hospital Management System
     Private Sub InfoPatients_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        CN = New SqlConnection("data source=LAPTOP-4HV6V7EN\SQLEXPRESS;integrated security=true;initial catalog=Hospital_Management_System")
+        CN = New SqlConnection("data source=tcp:mednat.ieeta.pt\SQLSERVER,8101;integrated security=true;initial catalog=Hospital_Management_System")
         CMD = New SqlCommand
         CMD.Connection = CN
     End Sub
@@ -37,6 +37,9 @@ Public Class infoQuartos
         txt_IDquarto.Text = ""
         txt_DataEntrada.Text = ""
         txt_DataSaida.Text = ""
+        txt_add_IDcama.Text = ""
+        txt_adicionarEnfS.Text = ""
+
     End Sub
 
 
@@ -54,8 +57,10 @@ Public Class infoQuartos
             ''Debug.WriteLine("Fine !!")
             lv_Pacientes.Items.Clear()
             lv_CamaHospital.Items.Clear()
+            lv_EnfermeirosS.Items.Clear()
             currentPatient_ListView = 0
             currentCama_ListView = 0
+            currentEnf_ListView = 0
         Else
 
             ''''''' LISTA PACIENTES 
@@ -92,7 +97,6 @@ Public Class infoQuartos
             CMD.Parameters.Clear()
             ''' Obter as camas totais do ID do quarto inserido no txt
             CMD.CommandText = "SELECT * FROM getCamaHospitalBy_IDQuarto(" + txt_IDquarto.Text + ")"
-            Debug.WriteLine(CMD.CommandText)
             CN.Open()
             '' DataReader !! 
             Dim RDR_2 As SqlDataReader
@@ -102,9 +106,9 @@ Public Class infoQuartos
                 Dim CH As New CamaHospital
 
                 CH.IDcama = RDR_2.Item("ID_Cama")
-                Debug.WriteLine(CH.IDcama)
+                'Debug.WriteLine(CH.IDcama)
                 CH.estadoCama = RDR_2.Item("camaOcupada")
-                Debug.WriteLine(CH.estadoCama)
+                'Debug.WriteLine(CH.estadoCama)
 
                 '' Add valores na listView
                 lv_CamaHospital.Items.Add(CH.IDcama)   '' 1º coluna
@@ -137,9 +141,8 @@ Public Class infoQuartos
                 EnfermeiroSup.IDfuncionarioEnfS = RDR_3.Item("func_ID_EnfS")
 
                 '' Add valores na listView
-                lv_EnfermeirosS.Items.Add(EnfermeiroSup.IDCamaEnfS)   '' 1º coluna
+                lv_EnfermeirosS.Items.Add(EnfermeiroSup.IDCamaEnfS)
                 lv_EnfermeirosS.Items(currentEnf_ListView).SubItems.Add(EnfermeiroSup.IDfuncionarioEnfS)
-
                 currentEnf_ListView += 1
             End While
             CN.Close()
@@ -312,5 +315,100 @@ Public Class infoQuartos
         ClearFields()
         MsgBox("Dados do Paciente " + P.noUtenteSaude + " atualizados.")
 
+    End Sub
+
+    ''''' Adicionar um enfermeiro à lista de enfermiros supervisores e atribuir-lhe 
+    ''''' uma cama para supervisionar.
+    Private Sub bttn_adicionarEnfS_Click(sender As Object, e As EventArgs) Handles bttn_adicionarEnfS.Click
+        Try
+            SaveEnfermeiroSup()
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+    End Sub
+
+    Private Function SaveEnfermeiroSup() As Boolean
+        Dim enfermeiroSup As New EnfermeiroSupervisor
+
+        Try
+            enfermeiroSup.IDCamaEnfS = txt_add_IDcama.Text
+            enfermeiroSup.IDfuncionarioEnfS = txt_adicionarEnfS.Text
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
+            Return False
+        End Try
+
+        addEnfermeiroSup(enfermeiroSup)        ''' Adicionar enfermeiro + atribuir-lhe uma cama.
+        Return True
+    End Function
+
+    Private Sub addEnfermeiroSup(ByVal Enf As EnfermeiroSupervisor)
+        CN.Open()
+        CMD.CommandType = CommandType.StoredProcedure
+        CMD.Parameters.Clear()
+        CMD.CommandText = "[dbo].[sp_addEnfermeiroS]"
+        CMD.Parameters.AddWithValue("@func_ID_EnfS", Enf.IDfuncionarioEnfS)
+        CMD.Parameters.AddWithValue("@ID_Cama_EnfS", Enf.IDCamaEnfS)
+
+        Try
+            CMD.ExecuteNonQuery()
+        Catch ex As Exception
+            Throw New Exception("Failed to add nurse in database. " & vbCrLf & "ERROR MESSAGE: " & vbCrLf & ex.Message)
+        Finally
+            CN.Close()
+        End Try
+        CN.Close()
+
+        MsgBox("Enfermeiro Supervisor Inserido.")
+        ClearFields()
+    End Sub
+
+
+    ''''' Remover um enfermeiro à lista de enfermiros supervisores e desatribuir-lhe    ''''''''''''''''''''
+    ''''' a cama que supervisiona                                                       ''''''''''''''''''''
+    Private Sub bttn_removerEnfS_Click(sender As Object, e As EventArgs) Handles bttn_removerEnfS.Click
+        Try
+            Dim enfermeiroSup As New EnfermeiroSupervisor
+
+            Try
+                enfermeiroSup.IDfuncionarioEnfS = txt_adicionarEnfS.Text
+
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+
+            removerEnf_Sup(enfermeiroSup)        ''' Remover enfermeiro + desatribuir-lhe a cama.
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+    End Sub
+
+    Private Sub removerEnf_Sup(ByVal Enf As EnfermeiroSupervisor)
+        CN.Open()
+        CMD.CommandType = CommandType.StoredProcedure
+        CMD.Parameters.Clear()
+        CMD.CommandText = "[dbo].[sp_removeEnfermeiroS]"
+        CMD.Parameters.AddWithValue("@func_ID_EnfS", Enf.IDfuncionarioEnfS)
+
+        Try
+            CMD.ExecuteNonQuery()
+        Catch ex As Exception
+            Throw New Exception("Failed to remove nurse in database. " & vbCrLf & "ERROR MESSAGE: " & vbCrLf & ex.Message)
+        Finally
+            CN.Close()
+        End Try
+        CN.Close()
+
+        MsgBox("Enfermeiro Supervisor Removido.")
+        ClearFields()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        show_quartosHospitalvb.Show()
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        show_EnfermeirosNAOsup.Show()
     End Sub
 End Class

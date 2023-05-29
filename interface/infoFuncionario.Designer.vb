@@ -71,7 +71,7 @@ Partial Class infoFuncionario
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(544, 370)
+        Me.Button3.Location = New System.Drawing.Point(522, 419)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(94, 29)
         Me.Button3.TabIndex = 2
@@ -272,11 +272,11 @@ Partial Class infoFuncionario
         Me.searchBar.Size = New System.Drawing.Size(215, 27)
         Me.searchBar.TabIndex = 26
         '
-        'Form1
+        'infoFuncionario
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1182, 535)
+        Me.ClientSize = New System.Drawing.Size(1200, 583)
         Me.Controls.Add(Me.searchBar)
         Me.Controls.Add(Me.txtTipo)
         Me.Controls.Add(Me.txtSalario)
@@ -304,7 +304,8 @@ Partial Class infoFuncionario
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
-        Me.Name = "Form1"
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
+        Me.Name = "infoFuncionario"
         Me.Text = "Form1"
         Me.ResumeLayout(False)
         Me.PerformLayout()

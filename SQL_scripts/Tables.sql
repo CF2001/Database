@@ -3,15 +3,15 @@
 CREATE TABLE Funcionario (
 
 	func_ID			INT			CHECK(func_ID > 0)	NOT NULL,
-	primeiroNome	CHAR(15)	NOT NULL,
-	ultimoNome		CHAR(15)	NOT NULL,
-	genero			CHAR(1)		NOT NULL,	-- F ou M	
+	primeiroNome	CHAR(15)						NOT NULL,
+	ultimoNome		CHAR(15)						NOT NULL,
+	genero			CHAR(1)							NOT NULL,	-- F ou M	
 	morada			CHAR(40),
 	dataNascimento	DATE,
-	email			CHAR(30)	NOT NULL,
-	noTelefone		CHAR(9)		NOT NULL,
-	salary			SMALLMONEY	CHECK(salary > 0),
-	tipo			CHAR(1)		NOT NULL,
+	email			CHAR(30)						NOT NULL,
+	noTelefone		CHAR(9)							NOT NULL,
+	salary			SMALLMONEY	CHECK(salary > 0),		
+	tipo			CHAR(1)							NOT NULL	-- M - Medico; R - Rececionista, E - Enfermeiro
 
 	PRIMARY KEY (func_ID)
 );
@@ -199,18 +199,6 @@ CREATE TABLE EM_contemMed (
 
 
 ALTER TABLE Departamento ADD FOREIGN KEY (ID_supervisor_dept) REFERENCES Medico (func_ID_Medico) ;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

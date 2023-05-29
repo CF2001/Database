@@ -1,8 +1,9 @@
--- Um paciente não pode fazer mais que uma cirurgia do mesmo tipo no mesmo dia
+
+/** Um paciente não pode fazer mais que uma cirurgia do mesmo tipo no mesmo dia */
 DROP TRIGGER too_much_surgery;
 GO
 CREATE TRIGGER too_much_surgery ON Cirurgia
-AFTER INSERT
+INSTEAD OF INSERT
 AS
 
 	SET NOCOUNT ON;
@@ -47,7 +48,8 @@ SELECT * FROM Cirurgia;
 
 
 
--- Um médico só pode supervisionar no máximo uma equipa médica
+
+/** Um médico só pode supervisionar no máximo uma equipa médica */
 DROP TRIGGER supervisor_once;
 GO
 CREATE TRIGGER supervisor_once ON Equipa_Medica
@@ -92,7 +94,9 @@ GO
 INSERT INTO Equipa_Medica VALUES (7, 12);
 SELECT * FROM Equipa_Medica;
 
--- marcar uma Consulta
+
+
+/** marcar uma Consulta */
 DROP TRIGGER schedule_apointment;
 GO
 CREATE TRIGGER schedule_apointment ON Consulta

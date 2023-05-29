@@ -22,6 +22,7 @@ Partial Class infoQuartos
     'Não o modifique usando o editor de códigos.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txt_IDquarto = New System.Windows.Forms.TextBox()
@@ -52,6 +53,15 @@ Partial Class infoQuartos
         Me.lv_EnfermeirosS = New System.Windows.Forms.ListView()
         Me.ColumnHeader8 = New System.Windows.Forms.ColumnHeader()
         Me.ColumnHeader9 = New System.Windows.Forms.ColumnHeader()
+        Me.EnfermeiroSupervisor1 = New projetoBD.EnfermeiroSupervisor(Me.components)
+        Me.bttn_adicionarEnfS = New System.Windows.Forms.Button()
+        Me.txt_adicionarEnfS = New System.Windows.Forms.TextBox()
+        Me.Label10 = New System.Windows.Forms.Label()
+        Me.Label11 = New System.Windows.Forms.Label()
+        Me.txt_add_IDcama = New System.Windows.Forms.TextBox()
+        Me.bttn_removerEnfS = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Label1
@@ -99,7 +109,7 @@ Partial Class infoQuartos
         Me.Label6.BackColor = System.Drawing.SystemColors.ButtonFace
         Me.Label6.CausesValidation = False
         Me.Label6.Font = New System.Drawing.Font("Segoe UI", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
-        Me.Label6.Location = New System.Drawing.Point(951, 155)
+        Me.Label6.Location = New System.Drawing.Point(908, 155)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(129, 23)
         Me.Label6.TabIndex = 55
@@ -108,9 +118,9 @@ Partial Class infoQuartos
         'lv_CamaHospital
         '
         Me.lv_CamaHospital.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader5, Me.ColumnHeader6})
-        Me.lv_CamaHospital.Location = New System.Drawing.Point(951, 196)
+        Me.lv_CamaHospital.Location = New System.Drawing.Point(908, 196)
         Me.lv_CamaHospital.Name = "lv_CamaHospital"
-        Me.lv_CamaHospital.Size = New System.Drawing.Size(250, 271)
+        Me.lv_CamaHospital.Size = New System.Drawing.Size(304, 271)
         Me.lv_CamaHospital.TabIndex = 60
         Me.lv_CamaHospital.UseCompatibleStateImageBehavior = False
         Me.lv_CamaHospital.View = System.Windows.Forms.View.Details
@@ -118,13 +128,13 @@ Partial Class infoQuartos
         'ColumnHeader5
         '
         Me.ColumnHeader5.Text = "Identificação"
-        Me.ColumnHeader5.Width = 120
+        Me.ColumnHeader5.Width = 160
         '
         'ColumnHeader6
         '
         Me.ColumnHeader6.Text = "Estado"
         Me.ColumnHeader6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.ColumnHeader6.Width = 120
+        Me.ColumnHeader6.Width = 135
         '
         'lv_Pacientes
         '
@@ -272,7 +282,7 @@ Partial Class infoQuartos
         Me.Label5.BackColor = System.Drawing.SystemColors.ButtonFace
         Me.Label5.CausesValidation = False
         Me.Label5.Font = New System.Drawing.Font("Segoe UI", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
-        Me.Label5.Location = New System.Drawing.Point(951, 494)
+        Me.Label5.Location = New System.Drawing.Point(1240, 155)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(280, 23)
         Me.Label5.TabIndex = 77
@@ -281,9 +291,9 @@ Partial Class infoQuartos
         'lv_EnfermeirosS
         '
         Me.lv_EnfermeirosS.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader8, Me.ColumnHeader9})
-        Me.lv_EnfermeirosS.Location = New System.Drawing.Point(951, 522)
+        Me.lv_EnfermeirosS.Location = New System.Drawing.Point(1240, 196)
         Me.lv_EnfermeirosS.Name = "lv_EnfermeirosS"
-        Me.lv_EnfermeirosS.Size = New System.Drawing.Size(348, 183)
+        Me.lv_EnfermeirosS.Size = New System.Drawing.Size(348, 271)
         Me.lv_EnfermeirosS.TabIndex = 78
         Me.lv_EnfermeirosS.UseCompatibleStateImageBehavior = False
         Me.lv_EnfermeirosS.View = System.Windows.Forms.View.Details
@@ -299,11 +309,94 @@ Partial Class infoQuartos
         Me.ColumnHeader9.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.ColumnHeader9.Width = 220
         '
+        'EnfermeiroSupervisor1
+        '
+        Me.EnfermeiroSupervisor1.IDCamaEnfS = Nothing
+        Me.EnfermeiroSupervisor1.IDfuncionarioEnfS = Nothing
+        '
+        'bttn_adicionarEnfS
+        '
+        Me.bttn_adicionarEnfS.Location = New System.Drawing.Point(1240, 657)
+        Me.bttn_adicionarEnfS.Name = "bttn_adicionarEnfS"
+        Me.bttn_adicionarEnfS.Size = New System.Drawing.Size(151, 48)
+        Me.bttn_adicionarEnfS.TabIndex = 79
+        Me.bttn_adicionarEnfS.Text = "Adicionar"
+        Me.bttn_adicionarEnfS.UseVisualStyleBackColor = True
+        '
+        'txt_adicionarEnfS
+        '
+        Me.txt_adicionarEnfS.Location = New System.Drawing.Point(1240, 522)
+        Me.txt_adicionarEnfS.Name = "txt_adicionarEnfS"
+        Me.txt_adicionarEnfS.Size = New System.Drawing.Size(158, 27)
+        Me.txt_adicionarEnfS.TabIndex = 80
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Location = New System.Drawing.Point(1240, 494)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(248, 20)
+        Me.Label10.TabIndex = 81
+        Me.Label10.Text = "Insira o ID do Enfermeiro Supervisor"
+        '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Location = New System.Drawing.Point(1240, 570)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(139, 20)
+        Me.Label11.TabIndex = 83
+        Me.Label11.Text = "Insira o ID da Cama"
+        '
+        'txt_add_IDcama
+        '
+        Me.txt_add_IDcama.Location = New System.Drawing.Point(1240, 598)
+        Me.txt_add_IDcama.Name = "txt_add_IDcama"
+        Me.txt_add_IDcama.Size = New System.Drawing.Size(158, 27)
+        Me.txt_add_IDcama.TabIndex = 82
+        '
+        'bttn_removerEnfS
+        '
+        Me.bttn_removerEnfS.Location = New System.Drawing.Point(1437, 657)
+        Me.bttn_removerEnfS.Name = "bttn_removerEnfS"
+        Me.bttn_removerEnfS.Size = New System.Drawing.Size(151, 48)
+        Me.bttn_removerEnfS.TabIndex = 84
+        Me.bttn_removerEnfS.Text = "Remover"
+        Me.bttn_removerEnfS.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.BackColor = System.Drawing.SystemColors.ActiveCaption
+        Me.Button1.Location = New System.Drawing.Point(501, 79)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(153, 49)
+        Me.Button1.TabIndex = 85
+        Me.Button1.Text = "Quantidade de Camas por quarto"
+        Me.Button1.UseVisualStyleBackColor = False
+        '
+        'Button2
+        '
+        Me.Button2.BackColor = System.Drawing.SystemColors.ActiveCaption
+        Me.Button2.Location = New System.Drawing.Point(674, 79)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(140, 49)
+        Me.Button2.TabIndex = 86
+        Me.Button2.Text = "Enfermeiros Não Supervisores"
+        Me.Button2.UseVisualStyleBackColor = False
+        '
         'infoQuartos
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1312, 871)
+        Me.ClientSize = New System.Drawing.Size(1646, 871)
+        Me.Controls.Add(Me.Button2)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.bttn_removerEnfS)
+        Me.Controls.Add(Me.Label11)
+        Me.Controls.Add(Me.txt_add_IDcama)
+        Me.Controls.Add(Me.Label10)
+        Me.Controls.Add(Me.txt_adicionarEnfS)
+        Me.Controls.Add(Me.bttn_adicionarEnfS)
         Me.Controls.Add(Me.lv_EnfermeirosS)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label9)
@@ -366,4 +459,13 @@ Partial Class infoQuartos
     Friend WithEvents lv_EnfermeirosS As ListView
     Friend WithEvents ColumnHeader8 As ColumnHeader
     Friend WithEvents ColumnHeader9 As ColumnHeader
+    Friend WithEvents EnfermeiroSupervisor1 As EnfermeiroSupervisor
+    Friend WithEvents bttn_adicionarEnfS As Button
+    Friend WithEvents txt_adicionarEnfS As TextBox
+    Friend WithEvents Label10 As Label
+    Friend WithEvents Label11 As Label
+    Friend WithEvents txt_add_IDcama As TextBox
+    Friend WithEvents bttn_removerEnfS As Button
+    Friend WithEvents Button1 As Button
+    Friend WithEvents Button2 As Button
 End Class
