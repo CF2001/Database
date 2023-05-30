@@ -25,7 +25,7 @@
 ![Captura de ecrã 2023-05-29 212344](https://github.com/CF2001/Database/assets/84447852/db3e5eaf-7d46-4298-b3fd-112073358fc4)
 <br>
 
-### Departmental information interface
+### Department information interface
 
 ![Captura de ecrã 2023-05-29 212522](https://github.com/CF2001/Database/assets/84447852/8c5d6af5-037a-4bf5-b5e6-12b5ca2a0da5)
 
