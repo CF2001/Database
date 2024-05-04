@@ -31,4 +31,4 @@
 
 <br>
 
-Project developed with [Vasco Sousa](https://github.com/VS-UA)
+Project developed with [Vasco Santos](https://github.com/VS-UA)
